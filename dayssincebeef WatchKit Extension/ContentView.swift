@@ -71,10 +71,6 @@ struct ContentView: View {
             newAppState.lastActionDate = Date()
             saveViewContext()
             print("Successfully initialized app state")
-        } else {
-            print("App state already created")
-            let appState = getAppState()
-            print("Last action date: \(appState.lastActionDate!)")
         }
     }
     
