@@ -11,6 +11,11 @@ struct ContentView: View {
     
     @Environment(\.managedObjectContext) var viewContext
     
+    @FetchRequest(
+        entity: AppState.entity(),
+        sortDescriptors: [NSSortDescriptor(keyPath: \AppState.lastActionDate, ascending: true)]
+    ) var appStates: FetchedResults<AppState>
+    
     @State var showThumbsUpAlert = false
     @State var showThumbsDownAlert = false
     @State var daysSinceAction = 0
@@ -37,6 +42,8 @@ struct ContentView: View {
                 
                 Button(action: {
                     self.showThumbsUpAlert = true
+                    updateLastActionDate(date: Date())
+                    computeDaysSinceAction()
                 }) {
                     Text("👍")
                 }
@@ -54,6 +61,58 @@ struct ContentView: View {
                 }
             }
         }
+        .onAppear(perform: createAppState)
+        .onAppear(perform: computeDaysSinceAction)
+    }
+    
+    private func createAppState() {
+        if self.appStates.isEmpty {
+            let newAppState = AppState(context: self.viewContext)
+            newAppState.lastActionDate = Date()
+            saveViewContext()
+            print("Successfully initialized app state")
+        } else {
+            print("App state already created")
+            let appState = getAppState()
+            print("Last action date: \(appState.lastActionDate!)")
+        }
+    }
+    
+    private func getAppState() -> AppState {
+        self.appStates[0]
+    }
+    
+    private func updateLastActionDate(date: Date) {
+        let appState = getAppState()
+        appState.lastActionDate = date
+        saveViewContext()
+        print("Successfully updated lastActionDate")
+    }
+    
+    private func saveViewContext() {
+        do {
+            try self.viewContext.save()
+            print("Successfully saved view context")
+        } catch {
+            print("Unable to save view context: \(error), \(error.localizedDescription)")
+        }
+    }
+    
+    private func computeDaysSinceAction() {
+        print("Computing days since action")
+        let appState = getAppState()
+        let calendar = Calendar.current
+        
+        let lastActionDate = appState.lastActionDate
+        print("Last action date: \(appState.lastActionDate!)")
+        
+        let currentDate = Date()
+        print("Current date: \(currentDate)")
+        
+        let components = calendar.dateComponents([.day], from: lastActionDate!, to: currentDate)
+        
+        // update view
+        self.daysSinceAction = components.day!
     }
 }
 
