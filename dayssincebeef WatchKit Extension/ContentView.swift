@@ -19,14 +19,23 @@ struct ContentView: View {
     @State var showThumbsUpAlert = false
     @State var showThumbsDownAlert = false
     @State var daysSinceAction = 0
+    @State var maxStreak = 0
 
     var body: some View {
         VStack {
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("🥇\(maxStreak)")
+                }
+                Spacer()
+            }
+            
+            Spacer()
+            
             Text("Days Since 🥩")
                 .font(.title3)
                 .fontWeight(.medium)
                 .foregroundColor(Color.red)
-                .padding()
             
             Text(String(daysSinceAction))
                 .font(.title)
@@ -69,6 +78,7 @@ struct ContentView: View {
         if self.appStates.isEmpty {
             let newAppState = AppState(context: self.viewContext)
             newAppState.lastActionDate = Date()
+            newAppState.maxStreak = 0
             saveViewContext()
             print("Successfully initialized app state")
         }
@@ -83,6 +93,13 @@ struct ContentView: View {
         appState.lastActionDate = date
         saveViewContext()
         print("Successfully updated lastActionDate")
+    }
+    
+    private func updateMaxStreak(maxStreak: Int) {
+        let appState = getAppState()
+        appState.maxStreak = Int32(maxStreak)
+        saveViewContext()
+        print("Successfully updated maxStreak")
     }
     
     private func saveViewContext() {
@@ -109,6 +126,20 @@ struct ContentView: View {
         
         // update view
         self.daysSinceAction = components.day!
+        
+        // update max streak
+        computeMaxStreak(daysSinceAction: components.day!)
+    }
+    
+    private func computeMaxStreak(daysSinceAction: Int) {
+        print("Computing max streak")
+        let appState = getAppState()
+        
+        if daysSinceAction > appState.maxStreak {
+            updateMaxStreak(maxStreak: daysSinceAction)
+        }
+        
+        self.maxStreak = Int(appState.maxStreak)
     }
 }
 
