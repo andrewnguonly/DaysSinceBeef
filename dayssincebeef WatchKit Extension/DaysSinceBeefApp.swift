@@ -93,6 +93,19 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, UNUserNotificationCenter
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
-        print("handle notification")
+        
+        switch response.actionIdentifier {
+        case "ConfirmAction":
+            print("action confirmed")
+            break
+        case "DenyAction":
+            print("action denied")
+            break
+        default:
+            print(response.actionIdentifier)
+            break
+        }
+        
+        completionHandler()
     }
 }
