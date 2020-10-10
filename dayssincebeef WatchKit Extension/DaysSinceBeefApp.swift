@@ -11,6 +11,7 @@ import UserNotifications
 @main
 struct DaysSinceBeefApp: App {
     
+    @WKExtensionDelegateAdaptor private var extensionDelegate: ExtensionDelegate
     let persistenceController = PersistenceController.shared
     
     @SceneBuilder var body: some Scene {
@@ -23,15 +24,20 @@ struct DaysSinceBeefApp: App {
 
         WKNotificationScene(controller: NotificationController.self, category: "ActionCheck")
     }
-    
-    init() {
+}
+
+class ExtensionDelegate: NSObject, WKExtensionDelegate, UNUserNotificationCenterDelegate {
+            
+    func applicationDidFinishLaunching() {
         registerNotifications()
     }
-    
+
     func registerNotifications() {
+
         requestNotificationAuthorization()
         registerNotificationCategories()
         registerActionCheckNotification()
+        UNUserNotificationCenter.current().delegate = self
     }
     
     func requestNotificationAuthorization() {
@@ -82,5 +88,11 @@ struct DaysSinceBeefApp: App {
                                             trigger: trigger)
         
         UNUserNotificationCenter.current().add(request)
+    }
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                didReceive response: UNNotificationResponse,
+                                withCompletionHandler completionHandler: @escaping () -> Void) {
+        print("handle notification")
     }
 }
