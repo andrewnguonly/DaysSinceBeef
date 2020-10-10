@@ -16,12 +16,14 @@
       "subtype" : "42mm"
     },
     {
+      "filename" : "dayssincebeef_notification_icon_58x58.png",
       "idiom" : "watch",
       "role" : "companionSettings",
       "scale" : "2x",
       "size" : "29x29"
     },
     {
+      "filename" : "dayssincebeef_notification_icon_87x87.png",
       "idiom" : "watch",
       "role" : "companionSettings",
       "scale" : "3x",
