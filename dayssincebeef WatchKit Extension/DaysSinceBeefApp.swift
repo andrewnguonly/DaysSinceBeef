@@ -21,7 +21,7 @@ struct DaysSinceBeefApp: App {
             }
         }
 
-        WKNotificationScene(controller: NotificationController.self, category: "BeefCheck")
+        WKNotificationScene(controller: NotificationController.self, category: "ActionCheck")
     }
     
     init() {
@@ -31,7 +31,7 @@ struct DaysSinceBeefApp: App {
     func registerNotifications() {
         requestNotificationAuthorization()
         registerNotificationCategories()
-        registerBeefCheckNotification()
+        registerActionCheckNotification()
     }
     
     func requestNotificationAuthorization() {
@@ -47,27 +47,40 @@ struct DaysSinceBeefApp: App {
     
     func registerNotificationCategories() {
         
-        let confirmAction = UNNotificationAction(identifier: "ConfirmAction", title: "👍", options: [.foreground])
-        let denyAction = UNNotificationAction(identifier: "DenyAction", title: "👎", options: [.foreground])
-        let beefCheckCategory = UNNotificationCategory(identifier: "BeefCheck", actions: [confirmAction, denyAction], intentIdentifiers: [], options: [])
+        let confirmAction = UNNotificationAction(identifier: "ConfirmAction",
+                                                 title: "👍",
+                                                 options: [.foreground])
         
-        let categories: Set<UNNotificationCategory> = [beefCheckCategory]
+        let denyAction = UNNotificationAction(identifier: "DenyAction",
+                                              title: "👎",
+                                              options: [.foreground])
+        
+        let actionCheckCategory = UNNotificationCategory(identifier: "ActionCheck",
+                                                         actions: [confirmAction, denyAction],
+                                                         intentIdentifiers: [],
+                                                         options: [])
+        
+        let categories: Set<UNNotificationCategory> = [actionCheckCategory]
         UNUserNotificationCenter.current().setNotificationCategories(categories)
     }
     
-    func registerBeefCheckNotification() {
+    func registerActionCheckNotification() {
         
         let content = UNMutableNotificationContent()
         content.title = "🥩 Check"
         content.sound = UNNotificationSound.default
-        content.categoryIdentifier = "BeefCheck"
+        content.categoryIdentifier = "ActionCheck"
 
         // show this notification at 4AM every day
         var dateComponents = DateComponents()
         dateComponents.hour = 4
-        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents,
+                                                    repeats: true)
         
-        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
+        let request = UNNotificationRequest(identifier: UUID().uuidString,
+                                            content: content,
+                                            trigger: trigger)
+        
         UNUserNotificationCenter.current().add(request)
     }
 }
